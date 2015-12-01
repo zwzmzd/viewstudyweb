@@ -9,7 +9,7 @@ vemail = form.regexp(r".*@.*", "must be a valid email address")
 register_form = form.Form(
     form.Radio('rate', ['1', '2', '3', '4', '5']),
 )
-render = web.template.render('templates/', base='layout')
+
 
 def getDB():
     db = web.database(dbn='mysql', user='root', pw='toor', db='goodview')
@@ -124,7 +124,7 @@ class index:
                 session['userid'] = r[0]['id']
                 session['usertoken'] = r[0]['usertoken']
                 session['username'] = r[0]['username']
-                return u'Welcome %s %s' % (r[0]['username'], r[0]['usertoken'])
+                return render.welcome(r[0]['username'], r[0]['usertoken'])
 
 class new:
     def GET(self):
@@ -146,7 +146,7 @@ class new:
         session['username'] = username
 
         session.pop('granted', None)
-        return u'Welcome %s %s' % (username, usertoken)
+        return render.welcome(username, usertoken)
 
         
         
@@ -156,6 +156,7 @@ if web.config.get('_session') is None:
     web.config._session = session
 else:
     session = web.config._session
+render = web.template.render('templates/', base='layout', globals={'context': session})
 
 application = app.wsgifunc()
 if __name__ == "__main__":
