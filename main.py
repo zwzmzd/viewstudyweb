@@ -1,18 +1,73 @@
 import web
 import pymysql
 
+def getDB():
+    db = web.database(dbn='mysql', user='root', pw='toor', db='goodview')
+    return db
+
 urls = (
         '/', 'index',
-        '/login', 'login',
-        '/foods', 'foods',
-        '/carts', 'carts',
-        '/orders', 'orders',
-        '/admin/orders', 'admin_orders',
+        '/giverating', 'giverating',
+        '/getrating', 'getrating',
+        '/rate', 'rate',
+        '/addlist', 'addlist',
        )
 
-class index:
+render = web.template.render('templates/', base='layout')
+
+class giverating:
     def GET(self):
-        return "Hello, world!"
+        data = web.input()
+        item = data.item
+        rate = data.rate
+        ratetype = data.ratetype
+        db = getDB()
+        db.insert('rating', item=int(item), rate=int(rate), ratetype=int(ratetype))
+        raise web.accepted()
+
+class getrating:
+    def GET(self):
+        data = web.input()
+        item = data.item
+        db = getDB()
+        db.insert('rating', item=int(item), rate=int(rate), ratetype=int(ratetype))
+        raise web.accepted()
+
+class rate:
+    def GET(self):
+        data = web.input()
+        itemkey = data.item
+
+        db = getDB()
+        result = list(db.select('item', {'imgpath': itemkey}, where='imgpath=$imgpath'))
+        if len(result) == 0:
+            raise web.notfound()
+            
+        result = result[0]
+        abspath = u'http://7xoro6.com1.z0.glb.clouddn.com/%s' % result['imgpath']
+
+        return render.imageandform(result)
+
+class addlist:
+    def GET(self):
+        return
+        with open('bigben.txt', 'r') as fp:
+            firstline = fp.readline()
+            name = firstline.strip()
+
+            db = getDB()
+            cid = db.insert('category', categoryname=name)
+            
+            for line in fp:
+                imgpath = line.strip().split()[0]
+                db.insert('item', imgpath=imgpath.strip(), category=cid)
+
+
+
+class index:
+        
+    def GET(self):
+        return ''
 
 class login:
     def POST(self):
@@ -54,6 +109,7 @@ class admin_orders:
         
 
 
+app = web.application(urls, globals())
+application = app.wsgifunc()
 if __name__ == "__main__":
-    app = web.application(urls, globals())
     app.run()
