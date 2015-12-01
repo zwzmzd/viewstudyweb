@@ -1,29 +1,63 @@
+# -*-coding:utf-8-*-
 import web
-import pymysql
+import hashlib
+import random
+from web import form
+
+vpass = form.regexp(r".{3,20}$", 'must be between 3 and 20 characters')
+vemail = form.regexp(r".*@.*", "must be a valid email address")
+register_form = form.Form(
+    form.Radio('rate', ['1', '2', '3', '4', '5']),
+)
+render = web.template.render('templates/', base='layout')
 
 def getDB():
     db = web.database(dbn='mysql', user='root', pw='toor', db='goodview')
     return db
 
+
+def login_required(func):
+    def __func(self, *args, **kwargs):
+        if session.get('userid') is None:
+            raise web.forbidden() 
+        kwargs['userid'] = session.get('userid')
+        return func(self, *args, **kwargs)
+    return __func
+
+
 urls = (
         '/', 'index',
+        '/new', 'new',
         '/giverating', 'giverating',
         '/getrating', 'getrating',
         '/rate', 'rate',
         '/addlist', 'addlist',
        )
 
-render = web.template.render('templates/', base='layout')
 
 class giverating:
-    def GET(self):
+    @login_required
+    def POST(self, userid):
         data = web.input()
         item = data.item
         rate = data.rate
         ratetype = data.ratetype
+
         db = getDB()
-        db.insert('rating', item=int(item), rate=int(rate), ratetype=int(ratetype))
+
+        r = list(db.select('item', {'imgpath': item}, where='imgpath=$imgpath'))
+        if len(r) == 0:
+            raise web.notfound()
+
+        # 尝试更新老的标记
+        affected = db.update('rating', 
+                  vars=dict(item=r[0]['id'], ratetype=int(ratetype), usertoken=session.usertoken), 
+                  where='usertoken=$usertoken and item=$item and ratetype=$ratetype', 
+                  rate=int(rate))
+        if affected == 0:
+            db.insert('rating', item=r[0]['id'], rate=int(rate), ratetype=int(ratetype), usertoken=session.usertoken)
         raise web.accepted()
+
 
 class getrating:
     def GET(self):
@@ -33,8 +67,10 @@ class getrating:
         db.insert('rating', item=int(item), rate=int(rate), ratetype=int(ratetype))
         raise web.accepted()
 
+
 class rate:
-    def GET(self):
+    @login_required
+    def GET(self, userid):
         data = web.input()
         itemkey = data.item
 
@@ -42,15 +78,18 @@ class rate:
         result = list(db.select('item', {'imgpath': itemkey}, where='imgpath=$imgpath'))
         if len(result) == 0:
             raise web.notfound()
-            
         result = result[0]
-        abspath = u'http://7xoro6.com1.z0.glb.clouddn.com/%s' % result['imgpath']
 
-        return render.imageandform(result)
+        a = list(db.query('select * from item where imgpath=(select min(imgpath) from item where imgpath >$imgpath and category=$category)', vars={'imgpath': result['imgpath'], 'category':result['category']}))
+        b = list(db.query('select * from item where imgpath=(select max(imgpath) from item where imgpath <$imgpath and category=$category)', vars={'imgpath': result['imgpath'], 'category':result['category']}))
+        pre = None if len(b) == 0 else b[0]
+        next = None if len(a) == 0 else a[0]
+        return render.imageandform(result, register_form, pre, next)
+
 
 class addlist:
     def GET(self):
-        return
+        raise web.forbidden()
         with open('bigben.txt', 'r') as fp:
             firstline = fp.readline()
             name = firstline.strip()
@@ -63,53 +102,61 @@ class addlist:
                 db.insert('item', imgpath=imgpath.strip(), category=cid)
 
 
-
 class index:
+    def GET(self):
+        session.pop('userid', None)
+        return render.index()
+
+    def POST(self):
+        data = web.input()
+        token = data.get('token')
+        if token == '0xffd':
+            # 新用户
+            session['granted'] = True
+            raise web.seeother('/new')
+        else:
+            db = getDB()
+            r = list(db.select('webuser', {'usertoken': token}, where='usertoken=$usertoken'))
+            if len(r) == 0:
+                raise web.forbidden()
+            else:
+                # 老用户登录
+                session['userid'] = r[0]['id']
+                session['usertoken'] = r[0]['usertoken']
+                session['username'] = r[0]['username']
+                return u'Welcome %s %s' % (r[0]['username'], r[0]['usertoken'])
+
+class new:
+    def GET(self):
+        if session.get('granted') is None or session.get('userid') is not None:
+            raise web.forbidden()
+        return render.new()
+
+    def POST(self):
+        if session.get('granted') is None or session.get('userid') is not None:
+            raise web.forbidden()
+
+        username = web.input().username
+        usertoken = hashlib.sha224(str(random.getrandbits(128))).hexdigest()[:8]
+        db = getDB()
+        uid = db.insert('webuser', username=username, usertoken=usertoken)
+
+        session['userid'] = uid
+        session['usertoken'] = usertoken
+        session['username'] = username
+
+        session.pop('granted', None)
+        return u'Welcome %s %s' % (username, usertoken)
+
         
-    def GET(self):
-        return ''
-
-class login:
-    def POST(self):
-        data = web.input()
-        username = data.username
-        password = data.password
-        print username
-        print password
-        return username + password
-
-class foods:
-    def GET(self):
-        access_token = web.input().access_token
-        return None
-
-class carts:
-    def POST(self):
-        data = web.input()
-        access_token = data.access_token
-        return None
-
-    def PATCH(self):
-        data = web.input()
-        access_token = data.access_token
-        return None
-
-class orders:
-    def POST(self):
-        data = web.input()
-        access_token = data.access_token
-        cart_id = data.cart_id
-        return None
-
-class admin_orders:
-    def GET(self):
-        data = web.input()
-        access_token = data.access_token
-        return None
         
-
-
 app = web.application(urls, globals())
+if web.config.get('_session') is None:
+    session = web.session.Session(app, web.session.DiskStore('sessions'), {'count': 0})
+    web.config._session = session
+else:
+    session = web.config._session
+
 application = app.wsgifunc()
 if __name__ == "__main__":
     app.run()
