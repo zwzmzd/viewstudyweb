@@ -1,3 +1,57 @@
-$def with (item)
+$def with (item, form, pre, next)
 $var title: $item.imgpath
-<img src="http://7xoro6.com1.z0.glb.clouddn.com/$item.imgpath" class="img-thumbnail" />
+$var jsfiles: /static/a.js
+<div class="container">
+  <div class="row">
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+		<img src="http://7xoro6.com1.z0.glb.clouddn.com/$item.imgpath" width="700px" class="img-thumbnail" />
+	</div>
+    <div class="col-md-4">
+		<div class="row">
+			<form method="POST" id="ratingform">
+				<input type="hidden" name="item" value="$item.imgpath" />
+				<input type="hidden" name="ratetype" value="0" />
+				$:form.render()
+			</form>
+		</div>
+		<div class="row">
+			<nav>
+			  <ul class="pager">
+				$if pre:
+					<li class="previous"><a href="/rate?item=$pre.imgpath"><span aria-hidden="true">&larr;</span> Prev</a></li>
+				$else:
+					<li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Prev</a></li>
+				
+				$if next:
+					<li class="next"><a href="/rate?item=$next.imgpath">Next <span aria-hidden="true">&rarr;</span></a></li>
+				$else:
+					<li class="next disabled"><a href="/rate?item=#">Next <span aria-hidden="true">&rarr;</span></a></li>
+			  </ul>
+			</nav>
+		</div>
+		<div class="row">
+			<p><b>Current Image</b>: $item.imgpath</p>
+		</div>
+		<div id="tips" class="row novisible">
+			<div class="alert alert-success" role="alert">
+			  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+			  <span class="sr-only">Hello:</span>
+			  Rated Successfully
+			</div>
+		</div>
+		<div class="row">
+			<h3>Rating Guideline</h3>
+			<p> Please focus on the viewpoint</p>
+			<ul>
+				<li>5: Very Good</li>
+				<li>4: Good</li>
+				<li>3: Not good not bad</li>
+				<li>2: Bad</li>
+				<li>1: Very bad</li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</div>
