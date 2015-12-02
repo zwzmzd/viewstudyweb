@@ -1,19 +1,13 @@
 $def with (item, form, pre, next)
 $var title: $item.imgpath
 $var jsfiles: /static/a.js
-  <div class="row">
-  </div>
-  <div class="row">
+<div class="row">
     <div class="col-md-8">
-		<img src="http://7xoro6.com1.z0.glb.clouddn.com/$item.imgpath" width="700px" class="img-thumbnail" />
+		<img src="//dn-goodview.qbox.me/$item.imgpath" width="700px" class="img-thumbnail" />
 	</div>
     <div class="col-md-4">
 		<div class="row">
-			<form method="POST" id="ratingform">
-				<input type="hidden" name="item" value="$item.imgpath" />
-				<input type="hidden" name="ratetype" value="0" />
-				$:form.render()
-			</form>
+			<p><b>Current Image</b>: $item.imgpath</p>
 		</div>
 		<div class="row">
 			<nav>
@@ -30,16 +24,7 @@ $var jsfiles: /static/a.js
 			  </ul>
 			</nav>
 		</div>
-		<div class="row">
-			<p><b>Current Image</b>: $item.imgpath</p>
-		</div>
-		<div id="tips" class="row novisible">
-			<div class="alert alert-success" role="alert">
-			  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-			  <span class="sr-only">Hello:</span>
-			  Rated Successfully
-			</div>
-		</div>
+		
 		<div class="row">
 			<h3>Rating Guideline</h3>
 			<p> Please focus on the viewpoint</p>
@@ -51,8 +36,24 @@ $var jsfiles: /static/a.js
 				<li>1: Very bad</li>
 			</ul>
 		</div>
+		
+		<div class="row form-column">
+			<form method="POST" id="ratingform">
+				<input type="hidden" name="item" value="$item.imgpath" />
+				<input type="hidden" name="ratetype" value="0" />
+				$:form.render()
+			</form>
+		</div>
+		
+		<div id="tips" class="row novisible">
+			<div class="alert alert-success" role="alert">
+			  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+			  <span class="sr-only">Hello:</span>
+			  Rated Successfully
+			</div>
+		</div>
 		<div class="row">
 			<abbr title="You can login anywhere using this code" class="initialism">Your Access Token</abbr> <kbd>$context.usertoken</kbd>
 		</div>
 	</div>
-  </div>
+</div>
