@@ -4,11 +4,6 @@ import hashlib
 import random
 from web import form
 
-vpass = form.regexp(r".{3,20}$", 'must be between 3 and 20 characters')
-vemail = form.regexp(r".*@.*", "must be a valid email address")
-register_form = form.Form(
-    form.Radio('rate', ['1', '2', '3', '4', '5']),
-)
 
 
 def getDB():
@@ -78,13 +73,30 @@ class rate:
         result = list(db.select('item', {'imgpath': itemkey}, where='imgpath=$imgpath'))
         if len(result) == 0:
             raise web.notfound()
-        result = result[0]
+        result = None if len(result) == 0 else result[0]
+
+        old_rating = list(db.select('rating', 
+                  dict(item=result['id'], ratetype=0, usertoken=session.usertoken), 
+                  where='usertoken=$usertoken and item=$item and ratetype=$ratetype'))
+        old_rating = None if len(old_rating) == 0 else old_rating[0]
+
 
         a = list(db.query('select * from item where imgpath=(select min(imgpath) from item where imgpath >$imgpath and category=$category)', vars={'imgpath': result['imgpath'], 'category':result['category']}))
         b = list(db.query('select * from item where imgpath=(select max(imgpath) from item where imgpath <$imgpath and category=$category)', vars={'imgpath': result['imgpath'], 'category':result['category']}))
         pre = None if len(b) == 0 else b[0]
         next = None if len(a) == 0 else a[0]
-        return render.imageandform(result, register_form, pre, next)
+
+
+        if old_rating is None:
+            rating_form = form.Form(
+                form.Radio('rate', ['1', '2', '3', '4', '5']),
+            )
+        else:
+            # 如果之前已经标定了
+            rating_form = form.Form(
+                form.Radio('rate', ['1', '2', '3', '4', '5'], value=str(old_rating.rate)),
+            )
+        return render.imageandform(result, rating_form, pre, next)
 
 
 class addlist:
@@ -158,6 +170,5 @@ else:
     session = web.config._session
 render = web.template.render('templates/', base='layout', globals={'context': session})
 
-application = app.wsgifunc()
 if __name__ == "__main__":
     app.run()
