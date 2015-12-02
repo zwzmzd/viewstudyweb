@@ -5,7 +5,7 @@ try:
     DB = {
         'user': sae.const.MYSQL_USER,
         'password': sae.const.MYSQL_PASS,
-        'name': sea.const.MYSQL_DB,
+        'name': sae.const.MYSQL_DB,
         'host': sae.const.MYSQL_HOST,
         'port': sae.const.MYSQL_PORT
     }
