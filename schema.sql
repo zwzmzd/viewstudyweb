@@ -24,3 +24,8 @@ CREATE TABLE IF NOT EXISTS webuser (
   username varchar(255)
 ) DEFAULT CHARACTER SET=utf8;
  
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id char(128) UNIQUE NOT NULL,
+    atime timestamp NOT NULL default current_timestamp,
+    data text
+) DEFAULT CHARACTER SET=utf8;

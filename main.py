@@ -3,11 +3,17 @@ import web
 import hashlib
 import random
 from web import form
+import setting
 
-
+web.config.debug = setting.debug
 
 def getDB():
-    db = web.database(dbn='mysql', user='root', pw='toor', db='goodview')
+    db = web.database(dbn='mysql', 
+                      host=setting.DB['host'],
+                      port=int(setting.DB['port']),
+                      user=setting.DB['user'], 
+                      pw=setting.DB['password'],
+                      db=setting.DB['name'])
     return db
 
 
@@ -164,7 +170,8 @@ class new:
         
 app = web.application(urls, globals())
 if web.config.get('_session') is None:
-    session = web.session.Session(app, web.session.DiskStore('sessions'), {'count': 0})
+    db = getDB()
+    session = web.session.Session(app, web.session.DBStore(db, 'sessions'), {'count': 0})
     web.config._session = session
 else:
     session = web.config._session
