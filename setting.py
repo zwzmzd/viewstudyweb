@@ -1,4 +1,6 @@
 # coding: utf-8
+ratetype=0
+
 #数据库设定
 try:
     import sae.const

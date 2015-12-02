@@ -82,7 +82,7 @@ class rate:
         result = None if len(result) == 0 else result[0]
 
         old_rating = list(db.select('rating', 
-                  dict(item=result['id'], ratetype=0, usertoken=session.usertoken), 
+                  dict(item=result['id'], ratetype=setting.ratetype, usertoken=session.usertoken), 
                   where='usertoken=$usertoken and item=$item and ratetype=$ratetype'))
         old_rating = None if len(old_rating) == 0 else old_rating[0]
 
@@ -142,7 +142,9 @@ class index:
                 session['userid'] = r[0]['id']
                 session['usertoken'] = r[0]['usertoken']
                 session['username'] = r[0]['username']
-                return render.welcome(r[0]['username'], r[0]['usertoken'])
+                last = list(db.query('select max(imgpath) from item where id in (select item from rating where usertoken=$usertoken)', {'usertoken': r[0]['usertoken']}))
+                lastimg = last[0]['max(imgpath)'] if len(last) > 0 else None
+                return render.welcome(r[0]['username'], r[0]['usertoken'], lastimg)
 
 class new:
     def GET(self):
@@ -164,7 +166,7 @@ class new:
         session['username'] = username
 
         session.pop('granted', None)
-        return render.welcome(username, usertoken)
+        return render.welcome(username, usertoken, None)
 
         
         
