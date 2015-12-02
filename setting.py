@@ -10,6 +10,7 @@ try:
         'port': sae.const.MYSQL_PORT
     }
     debug = False
+    entry_token = '0xffd'
 except:
     DB = {
         'user': 'root',
@@ -19,3 +20,4 @@ except:
         'name': 'goodview'
     }
     debug = True
+    entry_token = '0xffd'

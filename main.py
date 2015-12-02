@@ -128,7 +128,7 @@ class index:
     def POST(self):
         data = web.input()
         token = data.get('token')
-        if token == '0xffd':
+        if token == setting.entry_token:
             # 新用户
             session['granted'] = True
             raise web.seeother('/new')
