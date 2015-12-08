@@ -13,12 +13,12 @@ $var jsfiles: /static/a.js
 			<nav>
 			  <ul class="pager">
 				$if pre:
-					<li class="previous"><a href="/rate?item=$pre.imgpath"><span aria-hidden="true">&larr;</span> Prev</a></li>
+					<li class="previous"><a href="/rate?item=$pre.imgpath"><span aria-hidden="true">&larr;</span> Prev&nbsp;<kbd>A</kbd></a></li>
 				$else:
 					<li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Prev</a></li>
 				
 				$if next:
-					<li class="next"><a href="/rate?item=$next.imgpath">Next <span aria-hidden="true">&rarr;</span></a></li>
+					<li class="next"><a href="/rate?item=$next.imgpath"><kbd>D</kbd>&nbsp;Next <span aria-hidden="true">&rarr;</span></a></li>
 				$else:
 					<li class="next disabled"><a href="/rate?item=#">Next <span aria-hidden="true">&rarr;</span></a></li>
 			  </ul>

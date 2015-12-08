@@ -7,11 +7,12 @@ $(document).ready(function() {
 
 	$(document).on('keydown', function(e) {
 		console.log(e.which);
-		if (e.which == 39) {
+		if (e.which == 68) {
 			var href = $('li.next').children('a').attr("href");
 			window.location.href = href;
-		} else if (e.which == 37)
+		} else if (e.which == 65) {
 			var href = $('li.previous').children('a').attr("href");
 			window.location.href = href;
+		}
 	});
 });
