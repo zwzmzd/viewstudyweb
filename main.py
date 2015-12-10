@@ -3,6 +3,7 @@ import web
 import hashlib
 import random
 from web import form
+import urllib
 import setting
 
 web.config.debug = setting.debug
@@ -20,7 +21,7 @@ def getDB():
 def login_required(func):
     def __func(self, *args, **kwargs):
         if session.get('userid') is None:
-            raise web.forbidden() 
+            raise web.seeother('/?url=%s' % urllib.quote(web.ctx.fullpath)) 
         kwargs['userid'] = session.get('userid')
         return func(self, *args, **kwargs)
     return __func
@@ -175,9 +176,14 @@ class index:
                 session['userid'] = r[0]['id']
                 session['usertoken'] = r[0]['usertoken']
                 session['username'] = r[0]['username']
-                last = list(db.query('select max(imgpath) from item where id in (select item from rating where usertoken=$usertoken)', {'usertoken': r[0]['usertoken']}))
-                lastimg = last[0]['max(imgpath)'] if len(last) > 0 else None
-                return render.welcome(r[0]['username'], r[0]['usertoken'], lastimg)
+
+                prev_url = data.get('url')
+                if prev_url: # 用户从其它页面跳转而来
+                    raise web.seeother(prev_url)
+                else:
+                    last = list(db.query('select max(imgpath) from item where id in (select item from rating where usertoken=$usertoken)', {'usertoken': r[0]['usertoken']}))
+                    lastimg = last[0]['max(imgpath)'] if len(last) > 0 else None
+                    return render.welcome(r[0]['username'], r[0]['usertoken'], lastimg)
 
 class new:
     def GET(self):
