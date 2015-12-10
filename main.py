@@ -33,7 +33,28 @@ urls = (
         '/getrating', 'getrating',
         '/rate', 'rate',
         '/addlist', 'addlist',
+        '/dump/(.*)', 'dump',
        )
+
+class dump:
+    '''获得标定数据'''
+    def GET(self, usertoken):
+        buf = []
+
+        db = getDB()
+        r = list(db.query('''
+SELECT item.imgpath, rating.rate
+FROM  `rating` ,  `item`
+WHERE rating.usertoken = $usertoken
+AND item.id = rating.item
+ORDER BY item.imgpath''', 
+            vars={'usertoken': usertoken}))
+
+        for case in r:
+            buf.append(case['imgpath'])
+            buf.append(str(case['rate']))
+
+        return u'\n'.join(buf)
 
 
 class giverating:
