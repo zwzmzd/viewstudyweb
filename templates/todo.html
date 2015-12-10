@@ -1,0 +1,11 @@
+$def with(todos)
+$var title: New user
+$var jsfiles:
+<div class="row">
+	<h3>Unfinished tasks</h3>
+	<ol>
+	$for i in todos:
+		<li><a href="/rate?item=$i.imgpath">$i.imgpath</a></li>
+	</ol>
+	</div>
+<div>

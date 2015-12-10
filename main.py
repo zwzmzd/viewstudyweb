@@ -30,11 +30,32 @@ urls = (
         '/', 'index',
         '/new', 'new',
         '/giverating', 'giverating',
-        '/getrating', 'getrating',
         '/rate', 'rate',
         '/addlist', 'addlist',
         '/dump/(.*)', 'dump',
+        '/todo/(.*)', 'todo',
        )
+
+class todo:
+    @login_required
+    def GET(self, category, userid):
+        db = getDB()
+        r = list(db.query('''
+SELECT *
+FROM item
+WHERE category = $category
+AND id NOT
+IN (
+ 
+SELECT item.id
+FROM  `rating` ,  `item`
+WHERE rating.usertoken = $usertoken
+AND item.id = rating.item
+)
+ORDER BY imgpath''',
+            vars={'usertoken': session.usertoken, 'category': int(category)}))
+        return render.todo(r)
+
 
 class dump:
     '''获得标定数据'''
@@ -78,15 +99,6 @@ class giverating:
                   rate=int(rate))
         if affected == 0:
             db.insert('rating', item=r[0]['id'], rate=int(rate), ratetype=int(ratetype), usertoken=session.usertoken)
-        raise web.accepted()
-
-
-class getrating:
-    def GET(self):
-        data = web.input()
-        item = data.item
-        db = getDB()
-        db.insert('rating', item=int(item), rate=int(rate), ratetype=int(ratetype))
         raise web.accepted()
 
 
