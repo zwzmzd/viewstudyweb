@@ -52,7 +52,7 @@ ORDER BY item.imgpath''',
 
         for case in r:
             buf.append(case['imgpath'])
-            buf.append(str(case['rate']))
+            buf.append('-1' if case['rate'] < 3 else '1')
 
         return u'\n'.join(buf)
 
