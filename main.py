@@ -141,8 +141,8 @@ class rate:
 
 class addlist:
     def GET(self):
-        raise web.forbidden()
-        with open('bigben.txt', 'r') as fp:
+        #raise web.forbidden()
+        with open('notredame.txt', 'r') as fp:
             firstline = fp.readline()
             name = firstline.strip()
 
@@ -152,6 +152,7 @@ class addlist:
             for line in fp:
                 imgpath = line.strip().split()[0]
                 db.insert('item', imgpath=imgpath.strip(), category=cid)
+		return 'ok'
 
 
 class index:
