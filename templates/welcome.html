@@ -3,9 +3,5 @@ $var title: Hello World
 $var jsfiles:
 <div class="row">
 	<p>Welcom $username, please remember your Access Token <kbd>$usertoken</kbd></p>
-	$if lastimg:
-		<span>Next: <a href="/rate?item=$lastimg">Continue the survey</a></span>
-		<span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/todo/1">Unfinished tasks</a></span>
-	$else:
-		<span>Next: <a href="/rate?item=kxm/img0000.jpg">Start the survey</a></span>
+	<span>Next: <a href="/dashboard">Start the survey</a></span>
 </div>

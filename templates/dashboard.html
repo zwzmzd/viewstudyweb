@@ -1,0 +1,11 @@
+$def with(categorys)
+$var title: All tasks
+$var jsfiles:
+<div class="row">
+	<h3>All Categorys</h3>
+	<ol>
+	$for i in categorys:
+		<li><a href="/todo/$i.id">$i.categoryname</a></li>
+	</ol>
+	</div>
+<div>

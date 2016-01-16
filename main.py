@@ -34,8 +34,17 @@ urls = (
         '/rate', 'rate',
         '/addlist', 'addlist',
         '/dump/(.*)', 'dump',
+        '/dashboard', 'dashboard',
         '/todo/(.*)', 'todo',
        )
+
+class dashboard:
+    @login_required
+    def GET(self, userid):
+        db = getDB()
+        r = list(db.select('category', vars={'enabled': True}, where='enabled=$enabled', order="id DESC"))
+        return render.dashboard(r)
+
 
 class todo:
     @login_required
@@ -69,7 +78,7 @@ SELECT item.imgpath, rating.rate
 FROM  `rating` ,  `item`
 WHERE rating.usertoken = $usertoken
 AND item.id = rating.item
-ORDER BY item.imgpath''', 
+ORDER BY item.category, item.imgpath''', 
             vars={'usertoken': usertoken}))
 
         for case in r:
@@ -184,9 +193,7 @@ class index:
                 if prev_url: # 用户从其它页面跳转而来
                     raise web.seeother(prev_url)
                 else:
-                    last = list(db.query('select max(imgpath) from item where id in (select item from rating where usertoken=$usertoken)', {'usertoken': r[0]['usertoken']}))
-                    lastimg = last[0]['max(imgpath)'] if len(last) > 0 else None
-                    return render.welcome(r[0]['username'], r[0]['usertoken'], lastimg)
+                    return render.welcome(r[0]['username'], r[0]['usertoken'])
 
 class new:
     def GET(self):
