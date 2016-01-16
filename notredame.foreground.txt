@@ -713,4 +713,3 @@ notredame/foreground/zemzina_317353158.png
 notredame/foreground/_fxr_2223134257.png
 notredame/foreground/_rom__112625391.png
 notredame/foreground/_rom__112625421.png
-notredame/foreground/
