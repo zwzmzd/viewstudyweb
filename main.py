@@ -219,7 +219,7 @@ class new:
         session['username'] = username
 
         session.pop('granted', None)
-        return render.welcome(username, usertoken, None)
+        return render.welcome(username, usertoken)
 
         
         
