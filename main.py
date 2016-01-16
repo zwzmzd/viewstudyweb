@@ -133,8 +133,8 @@ class rate:
         old_rating = None if len(old_rating) == 0 else old_rating[0]
 
 
-        a = list(db.query('select * from item where imgpath=(select min(imgpath) from item where imgpath >$imgpath and category=$category)', vars={'imgpath': result['imgpath'], 'category':result['category']}))
-        b = list(db.query('select * from item where imgpath=(select max(imgpath) from item where imgpath <$imgpath and category=$category)', vars={'imgpath': result['imgpath'], 'category':result['category']}))
+        a = list(db.query('select * from item where imgpath=(select min(imgpath) from item where imgpath >$imgpath and category=$category) AND category=$category', vars={'imgpath': result['imgpath'], 'category':result['category']}))
+        b = list(db.query('select * from item where imgpath=(select max(imgpath) from item where imgpath <$imgpath and category=$category) AND category=$category', vars={'imgpath': result['imgpath'], 'category':result['category']}))
         pre = None if len(b) == 0 else b[0]
         next = None if len(a) == 0 else a[0]
 
