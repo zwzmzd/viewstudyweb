@@ -5,6 +5,7 @@ import random
 from web import form
 import urllib
 import setting
+import helper
 
 web.config.debug = setting.debug
 
@@ -42,7 +43,7 @@ class dashboard:
     @login_required
     def GET(self, userid):
         db = getDB()
-        r = list(db.select('category', vars={'enabled': True}, where='enabled=$enabled', order="id DESC"))
+        r = list(db.select('category', vars={'enabled': True}, where='enabled=$enabled', order="id ASC"))
         return render.dashboard(r)
 
 
@@ -151,19 +152,22 @@ class rate:
 class addlist:
     def GET(self):
         #raise web.forbidden()
-        ret = []
-        with open('notredame.txt', 'r') as fp:
-            firstline = fp.readline()
-            name = firstline.strip()
+        data = web.input()
+        name = data.get('name')
+        filename = data.get('filename')
+        is_matrix = data.get('is_matrix', 0) == 1
+        if name and filename: 
+            with open(filename, 'r') as fp:
+                items = helper.parse_file(fp, is_matrix)
 
             db = getDB()
             cid = db.insert('category', categoryname=name)
-            
-            for line in fp:
-                imgpath = line.strip().split()[0]
-                ret.append(imgpath)
+            for imgpath in items :
                 db.insert('item', imgpath=imgpath.strip(), category=cid)
-        return '\n'.join(ret)
+            return '\n'.join(items)
+        else:
+            raise web.forbidden()
+            
 
 
 class index:
