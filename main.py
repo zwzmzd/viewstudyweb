@@ -94,12 +94,12 @@ class giverating:
     def POST(self, userid):
         data = web.input()
         item = data.item
+        category = data.category
         rate = data.rate
         ratetype = data.ratetype
 
         db = getDB()
-
-        r = list(db.select('item', {'imgpath': item}, where='imgpath=$imgpath'))
+        r = list(db.select('item', {'imgpath': item, 'category': category}, where='imgpath=$imgpath AND category=$category'))
         if len(r) == 0:
             raise web.notfound()
 
@@ -118,9 +118,11 @@ class rate:
     def GET(self, userid):
         data = web.input()
         itemkey = data.item
+        category = data.category
 
         db = getDB()
-        result = list(db.select('item', {'imgpath': itemkey}, where='imgpath=$imgpath'))
+        # 不同类目中可能会有重名的项目，必须加上类目
+        result = list(db.select('item', {'imgpath': itemkey, 'category': category}, where='imgpath=$imgpath AND category=$category'))
         if len(result) == 0:
             raise web.notfound()
         result = None if len(result) == 0 else result[0]

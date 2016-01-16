@@ -13,14 +13,14 @@ $var jsfiles: /static/a.js
 			<nav>
 			  <ul class="pager">
 				$if pre:
-					<li class="previous"><a href="/rate?item=$pre.imgpath"><span aria-hidden="true">&larr;</span> Prev&nbsp;<kbd>A</kbd></a></li>
+					<li class="previous"><a href="/rate?item=$pre.imgpath&category=$pre.category"><span aria-hidden="true">&larr;</span> Prev&nbsp;<kbd>A</kbd></a></li>
 				$else:
 					<li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Prev</a></li>
 				
 				$if next:
-					<li class="next"><a href="/rate?item=$next.imgpath"><kbd>D</kbd>&nbsp;Next <span aria-hidden="true">&rarr;</span></a></li>
+					<li class="next"><a href="/rate?item=$next.imgpath&category=$next.category"><kbd>D</kbd>&nbsp;Next <span aria-hidden="true">&rarr;</span></a></li>
 				$else:
-					<li class="next disabled"><a href="/rate?item=#">Next <span aria-hidden="true">&rarr;</span></a></li>
+					<li class="next disabled"><a href="#">Next <span aria-hidden="true">&rarr;</span></a></li>
 			  </ul>
 			</nav>
 		</div>
@@ -40,6 +40,7 @@ $var jsfiles: /static/a.js
 		<div class="row form-column">
 			<form method="POST" id="ratingform">
 				<input type="hidden" name="item" value="$item.imgpath" />
+				<input type="hidden" name="category" value="$item.category" />
 				<input type="hidden" name="ratetype" value="0" />
 				$:form.render()
 			</form>
