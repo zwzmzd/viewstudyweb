@@ -6,6 +6,7 @@ from web import form
 import urllib
 import setting
 import helper
+import os
 
 web.config.debug = setting.debug
 
@@ -159,7 +160,7 @@ class addlist:
         filename = data.get('filename')
         is_matrix = data.get('is_matrix', 0) == 1
         if name and filename: 
-            with open(filename, 'r') as fp:
+            with open(os.path.join(setting.ABSDIR, filename), 'r') as fp:
                 items = helper.parse_file(fp, is_matrix)
 
             db = getDB()
@@ -232,7 +233,9 @@ if web.config.get('_session') is None:
     web.config._session = session
 else:
     session = web.config._session
-render = web.template.render('templates/', base='layout', globals={'context': session})
+
+template_dir = os.path.join(setting.ABSDIR, 'templates')
+render = web.template.render(template_dir, base='layout', globals={'context': session})
 
 if __name__ == "__main__":
     app.run()
